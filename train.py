@@ -136,6 +136,8 @@ def parse_comma_separated_list(s):
 @click.option('--mirror',       help='Enable dataset x-flips', metavar='BOOL',                  type=bool, default=False, show_default=True)
 @click.option('--aug',          help='Augmentation mode',                                       type=click.Choice(['noaug', 'ada', 'fixed']), default='ada', show_default=True)
 @click.option('--resume',       help='Resume from given network pickle', metavar='[PATH|URL]',  type=str)
+@click.option('--resume_kimg',  help='Resume from kimg', metavar='INT',                         type=click.IntRange(min=0), default=0, show_default=True)
+@click.option('--augment_p',  help='Resume from augment_p', metavar='FLOAT',             type=click.FloatRange(min=0, max=1), default=0, show_default=True)
 @click.option('--freezed',      help='Freeze first layers of D', metavar='INT',                 type=click.IntRange(min=0), default=0, show_default=True)
 
 # Misc hyperparameters.
@@ -261,9 +263,11 @@ def main(**kwargs):
     # Resume.
     if opts.resume is not None:
         c.resume_pkl = opts.resume
+        c.resume_kimg = opts.resume_kimg
         c.ada_kimg = 100 # Make ADA react faster at the beginning.
         c.ema_rampup = None # Disable EMA rampup.
         c.loss_kwargs.blur_init_sigma = 0 # Disable blur rampup.
+        c.augment_p = opts.augment_p
 
     # Performance-related toggles.
     if opts.fp32:
